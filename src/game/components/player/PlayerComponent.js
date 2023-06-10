@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getDashboxSize, generateDashboardPositions } from '../../../domain/logics';
+import { getDashboxSize, generateDashboxPositions } from '../../../domain/logics';
 import { getImage } from '../../../ImageFactory';
 import { IMAGE_ROUTES } from '../../../domain/constants';
 
@@ -14,13 +14,10 @@ const PlayerComponent = (props) => {
 
 	useEffect(() => {
 		if (props.size) {
-			// use generateDashboardPositions
-			const dashboard_positions = generateDashboardPositions(props.boardSize);
-			const newPosition = dashboard_positions[props.position];
-			console.log('dashboard_positions', newPosition);
-
+			// use generateDashboxPositions
+			const dashbox_positions = generateDashboxPositions(props.boardSize);
+			const newPosition = dashbox_positions[props.position];
 			setPosition({ x: newPosition.left, y: newPosition.top });
-			console.log('updating position', props.position)
 		}
 	}, [props.size, props.position]);
 

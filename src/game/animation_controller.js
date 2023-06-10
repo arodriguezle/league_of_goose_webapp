@@ -1,5 +1,5 @@
 import { getImage } from "../ImageFactory";
-import { IMAGE_ROUTES } from "../domain/constants";
+import { IMAGE_ROUTES, getDiceSrcName } from "../domain/constants";
 import { SocketController } from "../domain/socket_controller";
 
 export class AnimationController {
@@ -96,15 +96,133 @@ export class AnimationController {
 	}
 
 	static async movePlayerAnimation(player_name, initial_position, final_position, movePlayerCallback) {
+		// disable throw dice div
+		const throw_dice_button = document.getElementById('throw_dice_button');
+		throw_dice_button.classList.add('pointer-events-none');
+
 		// find player
 		const player = document.getElementById(player_name)
 
-		for (let i = initial_position; i < final_position; i++) {
+		for (let i = initial_position; i <= final_position; i++) {
 			player.position = i;
 			console.log('move player animation', player_name, i);
 
 			movePlayerCallback(player_name, i);
 			await new Promise(resolve => setTimeout(resolve, 1000));
 		}
+
+		// enable throw dice div
+		throw_dice_button.classList.remove('pointer-events-none');
 	}
+
+	static async triggerDashboxAnimation(player_name, dash_position, effectCallback) {
+
+		// disable throw dice div
+		const throw_dice_button = document.getElementById('throw_dice_button');
+		throw_dice_button.classList.add('pointer-events-none');
+
+		// find player
+		const player = document.getElementById(player_name)
+
+		player.position = dash_position;
+		console.log('trigger dash animation', player_name, dash_position);
+
+		effectCallback(player_name, dash_position);
+		await new Promise(resolve => setTimeout(resolve, 1000));
+
+		// enable throw dice div
+		throw_dice_button.classList.remove('pointer-events-none');
+	}
+
+	static async giveDiceAnimation(target, value, giveDiceCallback) {
+		console.log('give dice animation', target, value);
+
+		// disable throw dice div
+		const throw_dice_button = document.getElementById('throw_dice_button');
+		throw_dice_button.classList.add('pointer-events-none');
+
+		// get animation container
+		const animation_container = document.getElementById('animation_container');
+		// blur board
+		const board = document.getElementById('board');
+		board.classList.add('blur');
+		// create image with the dice image
+		const dice_image_src = getImage(IMAGE_ROUTES.dashboxs, `${getDiceSrcName(value)}.png`, { alt: 'dice' }).props.src;
+		const dice = document.createElement('img');
+		dice.id = 'dice';
+		dice.classList.add('absolute', 'w-1/3', 'h-1/3', 'z-20', 'flex', 'justify-center', 'items-center', 'top-1/2', 'left-1/2', 'transform', '-translate-x-1/2', '-translate-y-1/2');
+		dice.src = dice_image_src;
+		// add dice to animation container
+		animation_container.appendChild(dice);
+
+		giveDiceCallback(target, value);
+
+		// wait for dice animation to finish
+		await new Promise(resolve => setTimeout(resolve, 3000));
+
+		// remove dice
+		dice.remove();
+
+		// remove background blur
+		board.classList.remove('blur');
+
+		// enable throw dice div
+		throw_dice_button.classList.remove('pointer-events-none');
+	}
+
+	static async removeDiceAnimation(target, value, removeDiceCallback) {
+		console.log('remove dice animation', target, value);
+		// disable throw dice div
+		const throw_dice_button = document.getElementById('throw_dice_button');
+		throw_dice_button.classList.add('pointer-events-none');
+
+		// get animation container
+		const animation_container = document.getElementById('animation_container');
+
+		// blur board
+		const board = document.getElementById('board');
+		board.classList.add('blur');
+
+		// remove dice animation
+		console.log('remove dice animation', target, value);
+
+		removeDiceCallback(target);
+
+		// wait for dice animation to finish
+		await new Promise(resolve => setTimeout(resolve, 3000));
+
+		// remove background blur
+		board.classList.remove('blur');
+
+		// enable throw dice div
+		throw_dice_button.classList.remove('pointer-events-none');
+	}
+
+	static async showTextAnimation(target, value, showTextCallback) {
+		console.log('show text animation', target, value);
+		// disable throw dice div
+		const throw_dice_button = document.getElementById('throw_dice_button');
+		throw_dice_button.classList.add('pointer-events-none');
+
+		// get animation container
+		const animation_container = document.getElementById('animation_container');
+		// blur board
+		const board = document.getElementById('board');
+		board.classList.add('blur');
+
+		// remove dice animation
+		console.log('showTextC animation', target, value);
+
+		showTextCallback(target);
+
+		// wait for dice animation to finish
+		await new Promise(resolve => setTimeout(resolve, 3000));
+
+		// remove background blur
+		board.classList.remove('blur');
+
+		// enable throw dice div
+		throw_dice_button.classList.remove('pointer-events-none');
+	}
+
 }

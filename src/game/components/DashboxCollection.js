@@ -9,7 +9,7 @@ const DashboxCollection = props => {
 	const [dashboxs, setDashboxs] = useState([])
 	useEffect(() => {
 		if (props.board) {
-			setDashboxs(props.board.dashboxes)
+			setDashboxs(props.board.dashboxs)
 			setPositions(props.board.positions)
 		}
 	}, [props])
@@ -17,9 +17,9 @@ const DashboxCollection = props => {
 	return (
 		<>
 			{
-				dashboxs.map((dashbox, index) => {
-					const dashboard = getImage(IMAGE_ROUTES.dashboxs, dashbox.src, { width: 'w-full', height: 'w-full', alt: 'board' }).props
-					return <Dashbox key={index} index={index} positions={positions[index]} src={dashboard.src} size={props.size} value={dashbox.value} />
+				dashboxs.map((_dashbox, index) => {
+					const new_dashbox = getImage(IMAGE_ROUTES.dashboxs, _dashbox.src, { width: 'w-full', height: 'w-full', alt: 'board' }).props
+					return <Dashbox key={index} index={index} positions={positions[index]} src={new_dashbox.src} size={props.size} value={_dashbox.value} />
 				})
 			}
 		</>

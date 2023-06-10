@@ -1,6 +1,6 @@
-import { ACTIONS, ACTORS, DASHBOX_TYPES, DEFAULT_BOARD_LAYOUT, DICE_KINDS, TARGETS, getDiceName } from './constants';
+import { ACTIONS, ACTORS, DASHBOX_TYPES, DASHBOX_TYPES_ACTIONS, DEFAULT_BOARD_LAYOUT, DICE_KINDS, TARGETS, getDiceName } from './constants';
 
-export const generateBoardDashboxes = (seed) => {
+export const generateBoardDashboxs = (seed) => {
 	const dashboxs = [];
 	for (let i = 0; i < seed.length; i++) {
 		dashboxs.push({
@@ -39,7 +39,7 @@ export const getDashboxSize = (size) => {
 	return size.width / 25
 }
 
-export const generateDashboardPositions = (size, index = 0) => {
+export const generateDashboxPositions = (size, index = 0) => {
 	const dashbox_size = size.width / 25;
 	const board_vertical_size = size.height / 14;
 	const DEFAULT_POSITION = { top: board_vertical_size * 7 - board_vertical_size * 1 / 8, left: 0 }
@@ -87,7 +87,7 @@ export const generateDashboardPositions = (size, index = 0) => {
 	return positions;
 }
 
-export function getDashboardDescription(action_text) {
+export function getDashboxDescription(action_text) {
 	if (!action_text.includes('->')) return action_text;
 	const predicates = action_text.split('->');
 	let sentence = '';
@@ -159,6 +159,17 @@ export function getDashboardDescription(action_text) {
 		}
 	});
 	return sentence;
+}
+
+export function getDashboxEffect(dashbox) {
+	const dashbox_type = getKeyByValue(DASHBOX_TYPES, dashbox.value);
+	const action_text = DASHBOX_TYPES_ACTIONS[dashbox_type];
+	const actor = action_text.split('->')[0];
+	const action = action_text.split('->')[1];
+	const value = action_text.split('->')[2];
+	console.log('effect return', { actor, action, value });
+
+	return { actor, action, value };
 }
 
 export function getKeyByValue(object, value) {

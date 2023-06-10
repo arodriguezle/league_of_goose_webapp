@@ -122,6 +122,33 @@ export function getDiceName(dice) {
 	return dice_name + ' Dice (' + dice.charAt(dice.length - 1) + ')';
 }
 
+export function getDiceSrcName(dice) {
+	let dice_name = '';
+	switch (dice.charAt(dice.length - 1)) {
+		case '1':
+			dice_name = 'earth';
+			break;
+		case '2':
+			dice_name = 'fire';
+			break;
+		case '3':
+			dice_name = 'plant';
+			break;
+		case '4':
+			dice_name = 'wind';
+			break;
+		case '5':
+			dice_name = 'ice';
+			break;
+		case '6':
+			dice_name = 'water';
+			break;
+		default:
+			dice_name = '???';
+			break;
+	}
+	return dice_name + '_dice';
+}
 export const DICE_KINDS = {
 	normal: "normal",
 	boolean: "boolean",

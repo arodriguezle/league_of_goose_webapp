@@ -7,7 +7,7 @@ import PlayerComponent from './player/PlayerComponent';
 import { IMAGE_ROUTES } from '../../domain/constants';
 import { SocketController } from '../../domain/socket_controller';
 import PlayerUI from './PlayerUI';
-import { generateDashboardPositions, generateDefaultRandomSeed, generateBoardDashboxes } from '../../domain/logics'
+import { generateDashboxPositions, generateDefaultRandomSeed, generateBoardDashboxs } from '../../domain/logics'
 
 const Board = props => {
 	const background = getImage(IMAGE_ROUTES.maps, 'map_default.png', { alt: 'board' }).props
@@ -46,10 +46,10 @@ const Board = props => {
 					SocketController.emit("save_seed", seed)
 				} else {
 					const seed = data.room_state.game_state.seed
-					const dashboxes = generateBoardDashboxes(seed)
+					const dashboxs = generateBoardDashboxs(seed)
 					const size = { width: boardWidth, height: boardHeight }
-					const positions = generateDashboardPositions(size)
-					setBoard({ dashboxes: dashboxes, positions: positions })
+					const positions = generateDashboxPositions(size)
+					setBoard({ dashboxs: dashboxs, positions: positions })
 					setPlayersAssets(data.room_state.players_assets)
 				}
 			});
@@ -95,8 +95,6 @@ const Board = props => {
 									if (key_position) {
 										goose_skin = key_position.gooseSkin
 									}
-									console.log('player_position', player_position)
-									// key? index? name? position?
 									return <PlayerComponent boardSize={{ height: boardHeight, width: boardWidth }} skin={goose_skin} key={index} name={key} size={{ width: boardWidth, height: boardHeight - 20 }} position={player_position}></PlayerComponent>
 								})}
 							</div>
@@ -105,7 +103,7 @@ const Board = props => {
 				)}
 			</TransformWrapper>
 		</div>
-		<PlayerUI playersPositions={playersPositions} setPlayersPositions={setPlayersPositions} playersAssets={playersAssets} />
+		<PlayerUI board={board} playersPositions={playersPositions} setPlayersPositions={setPlayersPositions} playersAssets={playersAssets} setPlayersAssets={setPlayersAssets} />
 	</>)
 }
 
