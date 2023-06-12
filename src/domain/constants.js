@@ -199,8 +199,17 @@ export const getSpecialDicesNicenameByName = (dice_name) => {
 		case DICE_KINDS.lightned:
 			return DICE_KINDS_NICENAMES.lightned;
 		default:
-			return DICE_KINDS_NICENAMES.normal;
+			if (!dice_name || (dice_name && dice_name === DICE_KINDS.normal)) { return DICE_KINDS_NICENAMES.normal; }
+			else if (endsWithNumber(dice_name)) {
+				return `Dice ${dice_name.charAt(dice_name.length - 1)} (one time use)`;
+			} else {
+				return DICE_KINDS_NICENAMES.normal;
+			}
 	}
+}
+
+const endsWithNumber = (text) => {
+	return /\d$/.test(text);
 }
 
 export const getSpecialDicesDescriptionByName = (dice_name) => {
@@ -216,7 +225,12 @@ export const getSpecialDicesDescriptionByName = (dice_name) => {
 		case DICE_KINDS.lightned:
 			return DICE_KINDS_DESCRIPTIONS.lightned;
 		default:
-			return DICE_KINDS_DESCRIPTIONS.normal;
+			if (!dice_name || (dice_name && dice_name === DICE_KINDS.normal)) { return DICE_KINDS_DESCRIPTIONS.normal; }
+			else if (endsWithNumber(dice_name)) {
+				return `${dice_name.charAt(dice_name.length - 1)}`;
+			} else {
+				return DICE_KINDS_DESCRIPTIONS.normal;
+			}
 	}
 }
 

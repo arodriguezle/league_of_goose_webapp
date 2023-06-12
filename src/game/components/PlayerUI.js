@@ -2,16 +2,15 @@ import { getImage } from "../../ImageFactory"
 import { IMAGE_ROUTES, getSpecialDicesDescriptionByName, getSpecialDicesNicenameByName } from "../../domain/constants"
 import { useEffect, useState, useRef } from "react"
 import { SocketController } from "../../domain/socket_controller"
-import { getDiceNameByIndex } from "../../domain/logics"
 import { AnimationController } from "../animation_controller"
 const PlayerUI = (props) => {
-	const { playersAssets, playersPositions, setPlayersPositions, setPlayersAssets } = props
+	const { playersAssets, playersPositions, setPlayersPositions, setPlayersAssets, board } = props
 
 	const sides_bg_image = getImage(IMAGE_ROUTES.backgrounds, 'ui_sides.png', { alt: 'background' }).props
 	const center_bg_image = getImage(IMAGE_ROUTES.backgrounds, 'dice_selector.png', { alt: 'background' }).props
 	const arrow = getImage(IMAGE_ROUTES.icons, 'dice_arrow.png', { alt: 'border' }).props
 	const dice = getImage(IMAGE_ROUTES.dices_results, 'dice_default-1.png', { alt: 'border' }).props
-	const [selectedDice, setSelectedDice] = useState(1)
+	const [selectedDice, setSelectedDice] = useState(null)
 	const [gameState, setGameState] = useState(null)
 	const previousState = usePreviousState(gameState);
 
@@ -23,6 +22,9 @@ const PlayerUI = (props) => {
 	const minigoose_wind = getImage(IMAGE_ROUTES.minigooses, "goose_wind.png", { alt: 'minigoose_wind' }).props
 	const minigoose_plant = getImage(IMAGE_ROUTES.minigooses, "goose_plant.png", { alt: 'minigoose_plant' }).props
 
+
+
+	const [player_name, setPlayerName] = useState(null)
 
 	const movePlayerCallback = (player_name, position) => {
 		const updatedPlayersPositions = { ...playersPositions }
@@ -38,45 +40,87 @@ const PlayerUI = (props) => {
 		return ref.current;
 	}
 
-	const compareStates = (prev, next) => {
+	const compareStates = (prev, next, open_dashbox) => {
 		// check player postion changes
 		if (prev && next && prev.players_positions && next.players_positions) {
+			let moved = false;
 			Object.keys(prev.players_positions).forEach((player_name) => {
 				if (prev.players_positions[player_name] !== next.players_positions[player_name]) {
 					// player position changed
+					if (open_dashbox && !moved) {
+						console.log("open dashbox", board)
+						const dashbox = board.dashboxs[next.players_positions[player_name]]
+						AnimationController.showEffectToast(dashbox)
+						moved = true;
+					}
 					AnimationController.movePlayerAnimation(player_name, prev.players_positions[player_name], next.players_positions[player_name], movePlayerCallback)
 				}
 			})
+
+		}
+		if (prev && next && prev.players_assets && next.players_assets) {
+			// check new default goose in inventory
+			if (prev.players_assets[player_name] && next.players_assets[player_name] && prev.players_assets[player_name].inventory.default < next.players_assets[player_name].inventory.default) {
+				AnimationController.showFriendToast()
+			}
+			// check the dices 
+			if (next.players_assets[player_name] && next.players_assets[player_name].dices && next.players_assets[player_name].dices.length > 0) {
+				setSelectedDice(next.players_assets[player_name].dices[0])
+			}
+
+			setPlayersAssets(next.players_assets)
 		}
 	}
 
 	const throwDiceHandler = () => {
-		SocketController.emit('send_throw_dice', getDiceNameByIndex(selectedDice))
+		SocketController.emit('send_throw_dice', selectedDice)
 		SocketController.on('game_update', (data) => {
 			console.log('EVENT RECIVED', data)
 			setGameState(data.game_state)
 		})
 	}
 
-
 	useEffect(() => {
-		if (!previousState || gameState.round > previousState.round || gameState.effect_round > previousState.effect_round) {
-			compareStates(previousState, gameState)
+		console.log('compareStates', previousState, gameState)
+
+		if (previousState && gameState && (gameState.round > previousState.round || gameState.effect_round > previousState.effect_round)) {
+			console.log('compareStates', previousState, gameState)
+			compareStates(previousState, gameState, gameState.round > previousState.round)
+		}
+		const player_name = SocketController.player.username
+		if (player_name) {
+			setPlayerName(player_name)
 		}
 	}, [gameState])
 
 	const selectDiceHandler = (inc) => {
-		let new_value = -1
-		// swap dice between 0 and 2
-		if (selectedDice === 0 && inc === -1) {
-			new_value = 2
-		} else if (selectedDice === 2 && inc === 1) {
-			new_value = 0
-		} else {
-			new_value = selectedDice + inc
-		}
+		let dice_index = 0
+		if (playersAssets && playersAssets[player_name] && playersAssets[player_name].dices) {
+			const dices = playersAssets[player_name].dices
+			if (dices.length > 0) {
 
-		setSelectedDice(new_value)
+				dice_index = dices.indexOf(selectedDice)
+				console.log('dice_index', dice_index)
+
+				dice_index += inc
+
+				console.log('dice_index', dice_index)
+
+				if (dice_index < 0) {
+					dice_index = dices.length - 1
+				} else if (dice_index >= dices.length) {
+					dice_index = 0
+				}
+
+				console.log('dice_index', dice_index)
+
+				const new_value = dices[dice_index]
+
+				console.log('new_value', new_value)
+
+				setSelectedDice(new_value)
+			}
+		}
 	}
 
 	useEffect(() => {
@@ -84,14 +128,14 @@ const PlayerUI = (props) => {
 		if (SocketController.socket) {
 			SocketController.emit('get_game_state', true)
 			SocketController.on('get_game_state', (data) => {
-				if (!gameState)
-					setGameState(data.game_state)
+				if (!gameState) { setGameState(data.game_state) }
 			})
 			SocketController.on('throw_dice', (data) => {
-				if (data.result) {
-					const player_name = SocketController.player.username
-					if (playersAssets && playersAssets[player_name] && playersAssets[player_name].diceSkin) {
-						AnimationController.throwDiceAnimation(data.player_in_turn, playersAssets[player_name].diceSkin, data.result)
+				console.log('throw_dice', data)
+				if (data.result && data.player_in_turn) {
+					console.log('playersAssets[player_name].diceSkin', playersAssets[data.player_in_turn])
+					if (playersAssets && playersAssets[data.player_in_turn] && playersAssets[data.player_in_turn].diceSkin) {
+						AnimationController.throwDiceAnimation(data.player_in_turn, playersAssets[data.player_in_turn].diceSkin, data.result)
 					} else {
 						AnimationController.throwDiceAnimation(data.player_in_turn, 'dice_default', data.result)
 					}
@@ -99,7 +143,6 @@ const PlayerUI = (props) => {
 			})
 		}
 	}, [SocketController.socket])
-
 
 	return (
 		<>
@@ -117,7 +160,7 @@ const PlayerUI = (props) => {
 						backgroundSize: 'contain',
 						backgroundPosition: 'center',
 					}}>
-						0
+						{playersAssets && player_name && playersAssets[player_name].inventory.default}
 					</div>
 					<div className="pl-8 z-10 aspect-square flex justify-center h-[9vh] items-center text-amber-700" style={{
 						backgroundImage: `url("${minigoose_earth.src}")`,
@@ -125,7 +168,7 @@ const PlayerUI = (props) => {
 						backgroundSize: 'contain',
 						backgroundPosition: 'center',
 					}}>
-						0
+						{playersAssets && player_name && playersAssets[player_name].inventory.earth}
 					</div>
 					<div className="pl-8 z-10 aspect-square flex justify-center h-[9vh] items-center text-blue-50" style={{
 						backgroundImage: `url("${minigoose_wind.src}")`,
@@ -133,7 +176,7 @@ const PlayerUI = (props) => {
 						backgroundSize: 'contain',
 						backgroundPosition: 'center',
 					}}>
-						0
+						{playersAssets && player_name && playersAssets[player_name].inventory.wind}
 					</div>
 					<div className="pl-8 z-10 aspect-square flex justify-center h-[9vh] items-center text-lime-500" style={{
 						backgroundImage: `url("${minigoose_plant.src}")`,
@@ -141,7 +184,7 @@ const PlayerUI = (props) => {
 						backgroundSize: 'contain',
 						backgroundPosition: 'center',
 					}}>
-						0
+						{playersAssets && player_name && playersAssets[player_name].inventory.plant}
 					</div>
 					<div className="pl-8 z-10 aspect-square flex justify-center h-[9vh] items-center text-red-500" style={{
 						backgroundImage: `url("${minigoose_fire.src}")`,
@@ -149,7 +192,7 @@ const PlayerUI = (props) => {
 						backgroundSize: 'contain',
 						backgroundPosition: 'center',
 					}}>
-						0
+						{playersAssets && player_name && playersAssets[player_name].inventory.fire}
 					</div>
 					<div className="pl-8 z-10 aspect-square flex justify-center h-[9vh] items-center text-blue-300" style={{
 						backgroundImage: `url("${minigoose_ice.src}")`,
@@ -157,7 +200,7 @@ const PlayerUI = (props) => {
 						backgroundSize: 'contain',
 						backgroundPosition: 'center',
 					}}>
-						0
+						{playersAssets && player_name && playersAssets[player_name].inventory.ice}
 					</div>
 					<div className="pl-8 z-10 aspect-square flex justify-center h-[9vh] items-center text-cyan-400" style={{
 						backgroundImage: `url("${minigoose_water.src}")`,
@@ -165,7 +208,7 @@ const PlayerUI = (props) => {
 						backgroundSize: 'contain',
 						backgroundPosition: 'center',
 					}}>
-						0
+						{playersAssets && player_name && playersAssets[player_name].inventory.water}
 					</div>
 				</div>
 
@@ -203,16 +246,7 @@ const PlayerUI = (props) => {
 						}}
 						onClick={() => throwDiceHandler()}>
 					</div>
-					<div className="absolute w-[100%] h-[100%] flex justify-center items-center mt-[-25%]">
-						<div className="flex flex-col justify-center items-center">
-							<div className="text-white text-center text-sm font-bold">
-								{getSpecialDicesNicenameByName(getDiceNameByIndex(selectedDice))}
-							</div>
-							<div className="text-white text-center text-xs">
-								{getSpecialDicesDescriptionByName(getDiceNameByIndex(selectedDice))}
-							</div>
-						</div>
-					</div>
+
 				</div>
 
 				<div className="flex justify-start items-center h-full w-1/3">
@@ -235,6 +269,16 @@ const PlayerUI = (props) => {
 					backgroundSize: 'cover',
 					backgroundPosition: 'center',
 				}}>
+				<div className="absolute w-[100%] h-[100%] flex justify-center items-center">
+					<div className="inline-flex justify-center items-center gap-x-3">
+						<div className="text-white text-center text-sm font-bold">
+							{getSpecialDicesNicenameByName(selectedDice)}
+						</div>
+						<div className="text-white text-center text-xs">
+							{`(${getSpecialDicesDescriptionByName(selectedDice)})`}
+						</div>
+					</div>
+				</div>
 			</div>
 		</>
 	)

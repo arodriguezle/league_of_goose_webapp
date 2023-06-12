@@ -21,6 +21,7 @@ const SkinSelector = (props) => {
 				slidesPerView={1}
 				onSlideChange={(swiper) => {
 					const index = swiper.activeIndex
+					console.log(index)
 					if (props.setSelectedDiceSkin) {
 						props.setSelectedDiceSkin(index)
 					}

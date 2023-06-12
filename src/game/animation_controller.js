@@ -1,6 +1,9 @@
 import { getImage } from "../ImageFactory";
-import { IMAGE_ROUTES, getDiceSrcName } from "../domain/constants";
+import DashboxContent from "../dialogs/DashboxContent";
+import { DASHBOX_TYPES, DASHBOX_TYPES_ACTIONS, DASHBOX_TYPES_NICENAMES, IMAGE_ROUTES, getDiceSrcName } from "../domain/constants";
+import { getDashboxDescription, getKeyByValue } from "../domain/logics";
 import { SocketController } from "../domain/socket_controller";
+import Dashbox from "./components/Dashbox";
 
 export class AnimationController {
 	static async throwDiceAnimation(player_name, dice_skin, final_value) {
@@ -103,13 +106,26 @@ export class AnimationController {
 		// find player
 		const player = document.getElementById(player_name)
 
-		for (let i = initial_position; i <= final_position; i++) {
-			player.position = i;
-			console.log('move player animation', player_name, i);
+		// check if the difference between initial and final position is negative
 
-			movePlayerCallback(player_name, i);
-			await new Promise(resolve => setTimeout(resolve, 1000));
+
+		if (initial_position < final_position) {
+			for (let i = initial_position; i <= final_position; i++) {
+				player.position = i;
+				console.log('move player animation', player_name, i);
+
+				movePlayerCallback(player_name, i);
+				await new Promise(resolve => setTimeout(resolve, 1000));
+			}
+		} else {
+			for (let i = initial_position; i >= final_position; i--) {
+				player.position = i;
+				console.log('move player animation', player_name, i);
+				movePlayerCallback(player_name, i);
+				await new Promise(resolve => setTimeout(resolve, 1000));
+			}
 		}
+
 
 		// enable throw dice div
 		throw_dice_button.classList.remove('pointer-events-none');
@@ -225,4 +241,69 @@ export class AnimationController {
 		throw_dice_button.classList.remove('pointer-events-none');
 	}
 
+	static async showFriendToast() {
+		const toast = document.getElementById('new_friend_toast_container');
+
+		// FIXME: toast does not animate properly
+		toast.classList.add('ease-in-out', 'duration-500', 'transition');
+		toast.classList.remove('hidden', 'left-[-20%]');
+		await new Promise(resolve => setTimeout(resolve, 500));
+		toast.classList.add('left-0');
+		await new Promise(resolve => setTimeout(resolve, 2000));
+		toast.classList.remove('left-0');
+		await new Promise(resolve => setTimeout(resolve, 500));
+		toast.classList.add('hidden', 'left-[-20%]');
+	}
+
+	static async showEffectToast(dashbox) {
+		const { value, src } = dashbox;
+
+		console.log('asdadsasdad', value, src);
+		console.log('aaaaaaaaaaaaaaaaaaaaaaaaa', getKeyByValue(DASHBOX_TYPES, value));
+		const title = getKeyByValue(DASHBOX_TYPES, value);
+		const desc = getDashboxDescription(DASHBOX_TYPES_ACTIONS[title])
+
+		console.log('showEffectToast', title, desc);
+
+		const toast_effect_container = document.getElementById('toast_effect_container');
+		const toast_effect_img = document.getElementById('toast_effect_img');
+		const toast_effect_text = document.getElementById('toast_effect_text');
+
+		const image = getImage(IMAGE_ROUTES.dashboxs, src, { alt: 'dashbox' }).props;
+
+		const image_element = document.createElement('img');
+		image_element.src = image.src;
+		image_element.style.zIndex = '20';
+		image_element.style.width = '100%';
+		image_element.style.height = '100%';
+		image_element.style.backgroundRepeat = 'no-repeat';
+		image_element.style.backgroundPosition = 'center center';
+		image_element.style.backgroundSize = 'contain';
+		image_element.style.backgroundImage = `url(${image.src})`;
+
+		// set image
+		toast_effect_img.append(image_element);
+
+		const text_element_container = document.createElement('div');
+		text_element_container.classList.add('text-left', 'align-left');
+		const text_element_title = document.createElement('div');
+		text_element_title.classList.add('text-normal', 'font-bold');
+		text_element_title.innerText = `${DASHBOX_TYPES_NICENAMES[title]}`;
+		text_element_container.append(text_element_title);
+		const text_element_desc = document.createElement('div');
+		text_element_desc.classList.add('text-xs', 'font-bold', 'leading-none');
+		text_element_desc.innerText = `${desc}`;
+		text_element_container.append(text_element_desc);
+
+		// set text
+		toast_effect_text.append(text_element_container);
+
+		toast_effect_container.classList.add('ease-in-out', 'duration-500', 'transition');
+
+		await new Promise(resolve => setTimeout(resolve, 2000));
+		toast_effect_container.classList.remove('hidden');
+		await new Promise(resolve => setTimeout(resolve, 3000));
+		toast_effect_container.classList.add('hidden');
+
+	}
 }

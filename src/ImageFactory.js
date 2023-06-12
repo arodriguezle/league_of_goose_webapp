@@ -3,6 +3,7 @@ export function createImageFromAssets(route, image_url, props = { width: 'auto',
 	try {
 		return <img src={require("./assets/" + route + image_url)} alt={image_url} height={props.height} width={props.width}></img>;
 	} catch (error) {
+		console.log("Image not found: " + ("(./assets/" + route + image_url + ")"));
 		return <img src={require("./assets/not_found.png")} alt="404" height={props.height} width={props.width}></img>;
 	}
 }
@@ -26,6 +27,7 @@ export function getImage(route, image_name, props = { width: 'auto', height: 'au
 		const selected_image = cloneElement(ALL_IMAGES[route + "/" + image_name], props);
 		return selected_image;
 	} catch (error) {
+		console.log("Image not found: " + (route + "/" + image_name));
 		const selected_image = cloneElement(ALL_IMAGES['not_found.png'], props);
 		return selected_image;
 	}

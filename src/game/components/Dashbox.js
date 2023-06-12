@@ -24,7 +24,7 @@ const Dashbox = props => {
 	};
 	return (<>
 		{props.positions && props.size && <Fragment>
-			<div className={`absolute aspect-square border-[1px] border-black rounded-md`}
+			<div id={`dashbox_${props.index}`} className={`absolute aspect-square border-[1px] border-black rounded-md`}
 				style={{
 					backgroundImage: `url("${props.src}")`,
 					backgroundRepeat: 'no-repeat',

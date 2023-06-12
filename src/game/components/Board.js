@@ -48,20 +48,29 @@ const Board = props => {
 	useEffect(() => {
 		if (socket) {
 			SocketController.on("room_state", (data) => {
-				console.log(data.room_state.game_state.players_positions, Object.keys(data.room_state.game_state.players_positions).length > 0)
+				console.log(data.room_state.game_state)
 				if (Object.keys(data.room_state.game_state.players_positions).length > 0) {
 					setPlayersPositions(data.room_state.game_state.players_positions)
 				}
+				let seed = ''
 				if (data.room_state.waiting && boardHeight && boardWidth) {
-					const seed = generateDefaultRandomSeed(63)
+					seed = generateDefaultRandomSeed(63)
 					SocketController.emit("save_seed", seed)
 				} else {
-					const seed = data.room_state.game_state.seed
-					const dashboxs = generateBoardDashboxs(seed)
-					const size = { width: boardWidth, height: boardHeight }
-					const positions = generateDashboxPositions(size)
-					setBoard({ dashboxs: dashboxs, positions: positions })
-					setPlayersAssets(data.room_state.game_state.players_assets)
+					seed = data.room_state.game_state.seed
+				}
+				const dashboxs = generateBoardDashboxs(seed)
+				const size = { width: boardWidth, height: boardHeight }
+				const positions = generateDashboxPositions(size)
+				setBoard({ dashboxs: dashboxs, positions: positions })
+				setPlayersAssets(data.room_state.game_state.players_assets)
+				// check for a new player
+				console.log(playersAssets)
+				console.log('->')
+				console.log(data.room_state.game_state.players_assets)
+				if (Object.keys(playersAssets).length > 0 && Object.keys(playersAssets).length < Object.keys(data.room_state.game_state.players_assets).length) {
+					// refresh the board
+					window.location.reload()
 				}
 			});
 		}

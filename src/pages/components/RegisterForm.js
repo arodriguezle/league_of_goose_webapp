@@ -64,7 +64,7 @@ const RegisterForm = () => {
 					>
 						I agree the
 						<a
-							href="/documents/TermsConditions.txt"
+							href="/terms-and-conditions"
 							className="font-medium transition-colors hover:text-blue-500"
 						>
 							&nbsp;Terms and Conditions

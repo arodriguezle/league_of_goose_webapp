@@ -164,7 +164,3 @@ export function getDashboxDescription(action_text) {
 export function getKeyByValue(object, value) {
 	return Object.keys(object).find(key => object[key] === value);
 }
-
-export function getDiceNameByIndex(index) {
-	return Object.values(DICE_KINDS)[index];
-}

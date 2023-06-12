@@ -34,19 +34,22 @@ const RoomManager = (props) => {
 	};
 
 	const startGame = () => {
+		console.log('startGame', props.skins)
 		let dice_skin = props.skins.dice_skins[0]
 		if (props.diceSkin !== 'goose_default') {
 			dice_skin = props.skins.dice_skins[props.diceSkin]
 		}
+		console.log('dice_skin', dice_skin)
 		let goose_skin = props.skins.goose_skins[0]
 		if (props.gooseSkin !== 'goose_default') {
 			goose_skin = props.skins.goose_skins[props.gooseSkin]
 		}
-
+		console.log('goose_skin', goose_skin)
 		SocketController.emit("set_player_game_assets", {
 			dices: props.dices,
 			diceSkin: dice_skin,
 			gooseSkin: goose_skin,
+			inventory: { default: 0, fire: 0, ice: 0, wind: 0, earth: 0, water: 0, plant: 0 }
 		})
 		SocketController.emit("start_game", true)
 		window.location.href = "/game"

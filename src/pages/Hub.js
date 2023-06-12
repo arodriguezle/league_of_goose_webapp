@@ -14,13 +14,13 @@ const Hub = () => {
 	const [connectionStatus, setConnectionStatus] = useState('connecting'); // [connected, connecting, disconnected]
 	const [error, setError] = useState(null);
 
-	const [dice_1, setDice1] = useState('odds');
+	const [dice_1, setDice1] = useState('normal');
 	const [dice_2, setDice2] = useState('evens');
-	const [dice_3, setDice3] = useState('bolean');
+	const [dice_3, setDice3] = useState('odds');
 
-	const [openOptions1, setOpenOptions1] = useState(['odds', 'evens', 'bolean', 'weighted', 'lightned']);
-	const [openOptions2, setOpenOptions2] = useState(['odds', 'evens', 'bolean', 'weighted', 'lightned']);
-	const [openOptions3, setOpenOptions3] = useState(['odds', 'evens', 'bolean', 'weighted', 'lightned']);
+	const [openOptions1, setOpenOptions1] = useState(['odds', 'evens', 'boolean', 'weighted', 'lightned']);
+	const [openOptions2, setOpenOptions2] = useState(['odds', 'evens', 'boolean', 'weighted', 'lightned']);
+	const [openOptions3, setOpenOptions3] = useState(['odds', 'evens', 'boolean', 'weighted', 'lightned']);
 
 	const [selecteDiceSkin, setSelectedDiceSkin] = useState('default');
 	const [selectedGooseSkin, setSelectedGooseSkin] = useState('default');
@@ -91,7 +91,7 @@ const Hub = () => {
 					<div className="my-8">
 						<div className='uppercase font-bold text-white'>ROOM</div>
 						{/* TODO: remove test skins */}
-						<RoomManager dices={[dice_1, dice_2, dice_3]} gooseSkin={selectedGooseSkin} diceSkin={selecteDiceSkin} skins={{ dice_skins: inventory.dice_skins.concat("test dice"), goose_skins: inventory.goose_skins.concat("agent_g", "goose_spring", "goose_suits") }} />
+						<RoomManager dices={[dice_1, dice_2, dice_3]} gooseSkin={selectedGooseSkin} diceSkin={selecteDiceSkin} skins={{ dice_skins: inventory.dice_skins.concat("dice_aqua", "dice_froggy", "dice_nature"), goose_skins: inventory.goose_skins.concat("agent_g", "goose_spring", "goose_suits") }} />
 					</div>
 				</div>
 
