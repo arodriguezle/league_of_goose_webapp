@@ -31,7 +31,9 @@ export class SocketController {
 			getData(USE_API_ENDPOINT(API_ENDPOINTS.get) + "/myself", null).then((response) => {
 				SocketController.setSocket(socket);
 				SocketController.emit("login", response.data)
-				setSocket_callback(socket)
+				if (setSocket_callback) {
+					setSocket_callback(socket)
+				}
 				if (setPlayer_callback) {
 					setPlayer_callback(response.data)
 				}

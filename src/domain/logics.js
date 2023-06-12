@@ -1,4 +1,4 @@
-import { ACTIONS, ACTORS, DASHBOX_TYPES, DASHBOX_TYPES_ACTIONS, DEFAULT_BOARD_LAYOUT, DICE_KINDS, TARGETS, getDiceName } from './constants';
+import { ACTIONS, ACTORS, DASHBOX_TYPES, DEFAULT_BOARD_LAYOUT, DICE_KINDS, TARGETS, getDiceName } from './constants';
 
 export const generateBoardDashboxs = (seed) => {
 	const dashboxs = [];
@@ -161,45 +161,8 @@ export function getDashboxDescription(action_text) {
 	return sentence;
 }
 
-export function getDashboxEffect(dashbox) {
-	const dashbox_type = getKeyByValue(DASHBOX_TYPES, dashbox.value);
-	const action_text = DASHBOX_TYPES_ACTIONS[dashbox_type];
-	const actor = action_text.split('->')[0];
-	const action = action_text.split('->')[1];
-	const value = action_text.split('->')[2];
-	console.log('effect return', { actor, action, value });
-
-	return { actor, action, value };
-}
-
 export function getKeyByValue(object, value) {
 	return Object.keys(object).find(key => object[key] === value);
-}
-
-export function throwDiceAndGetValue(dice_name) {
-	switch (dice_name) {
-		case DICE_KINDS.normal:
-			// 1 to 6
-			return Math.floor(Math.random() * 6) + 1;
-		case DICE_KINDS.lightned:
-			// 1 to 3
-			return Math.floor(Math.random() * 3) + 1;
-		case DICE_KINDS.weighted:
-			// 4 to 6
-			return Math.floor(Math.random() * 3) + 4;
-		case DICE_KINDS.boolean:
-			// 1 or 6
-			return Math.random() < 0.5 ? 1 : 6;
-		case DICE_KINDS.evens:
-			// 2, 4 or 6
-			return Math.floor(Math.random() * 3) * 2 + 2;
-		case DICE_KINDS.odds:
-			// 1, 3 or 5
-			return Math.floor(Math.random() * 3) * 2 + 1;
-		default:
-			// 1 to 6
-			return Math.floor(Math.random() * 6) + 1;
-	}
 }
 
 export function getDiceNameByIndex(index) {

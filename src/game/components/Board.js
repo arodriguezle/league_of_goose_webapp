@@ -8,6 +8,7 @@ import { IMAGE_ROUTES } from '../../domain/constants';
 import { SocketController } from '../../domain/socket_controller';
 import PlayerUI from './PlayerUI';
 import { generateDashboxPositions, generateDefaultRandomSeed, generateBoardDashboxs } from '../../domain/logics'
+import { Button } from '@material-tailwind/react';
 
 const Board = props => {
 	const background = getImage(IMAGE_ROUTES.maps, 'map_default.png', { alt: 'board' }).props
@@ -18,7 +19,10 @@ const Board = props => {
 	const [boardHeight, setBoardHeight] = React.useState(0)
 	const [board, setBoard] = useState(null);
 
-	const [canLoadBoard, setCanLoadBoard] = useState(false);
+	const [screenMSG, setScreenMSG] = useState(<div className='fixed top-0 left-0 w-full h-full flex flex-col justify-center items-center  bg-[rgb(0,0,0,0.5)]'>
+		<div className='text-white'>Loading...</div>
+	</div>);
+
 	const [playersAssets, setPlayersAssets] = useState({});
 	const [playersPositions, setPlayersPositions] = useState({})
 
@@ -30,17 +34,24 @@ const Board = props => {
 	}, [boardRef]);
 
 	useEffect(() => {
-
-	}, [playersPositions]);
-
-	useEffect(() => {
 		SocketController.join(setSocket)
+		setTimeout(() => {
+			setScreenMSG(<div className='fixed top-0 left-0 w-full h-full flex flex-col justify-center items-center  bg-[rgb(0,0,0,0.5)]'>
+				<div className='text-white'>THIS ROOM NO LONGER EXISTS OR IS NOT READY YET!</div>
+				<Button className='w-32 mt-6' color="blue" onClick={() => window.location.reload()}>REFRESH</Button>
+				<Button className='w-32 mt-6' color="blue" onClick={() => window.location.href = '/hub'}>HUB</Button>
+				<Button className='w-32 mt-6' color="blue" onClick={() => window.location.href = '/home'}>HOME</Button>
+			</div>)
+		}, 3000)
 	}, []);
 
 	useEffect(() => {
 		if (socket) {
 			SocketController.on("room_state", (data) => {
-				setPlayersPositions(data.room_state.game_state.players_positions)
+				console.log(data.room_state.game_state.players_positions, Object.keys(data.room_state.game_state.players_positions).length > 0)
+				if (Object.keys(data.room_state.game_state.players_positions).length > 0) {
+					setPlayersPositions(data.room_state.game_state.players_positions)
+				}
 				if (data.room_state.waiting && boardHeight && boardWidth) {
 					const seed = generateDefaultRandomSeed(63)
 					SocketController.emit("save_seed", seed)
@@ -50,18 +61,12 @@ const Board = props => {
 					const size = { width: boardWidth, height: boardHeight }
 					const positions = generateDashboxPositions(size)
 					setBoard({ dashboxs: dashboxs, positions: positions })
-					setPlayersAssets(data.room_state.players_assets)
+					setPlayersAssets(data.room_state.game_state.players_assets)
 				}
 			});
 		}
 	}, [socket]);
 
-	useEffect(() => {
-		setCanLoadBoard(true)
-	}, [board]);
-
-	useEffect(() => {
-	}, [canLoadBoard]);
 
 	return (<>
 		<div id="board" style={{
@@ -86,24 +91,29 @@ const Board = props => {
 										backgroundSize: 'contain',
 										backgroundPosition: 'top center',
 									}}></div>
-								{canLoadBoard && <DashboxCollection board={board} size={{ width: boardWidth, height: boardHeight }} />}
+								{Object.keys(playersPositions).length > 0 && <DashboxCollection board={board} size={{ width: boardWidth, height: boardHeight }} />}
 								{playersPositions && Object.keys(playersPositions).map((key, index) => {
 									const key_position = playersAssets[key]
-									const player_position = playersPositions[key]
-
+									let player_position = playersPositions[key]
+									if (player_position < 0) {
+										player_position = 0
+									}
 									let goose_skin = 'goose_default'
 									if (key_position) {
 										goose_skin = key_position.gooseSkin
 									}
 									return <PlayerComponent boardSize={{ height: boardHeight, width: boardWidth }} skin={goose_skin} key={index} name={key} size={{ width: boardWidth, height: boardHeight - 20 }} position={player_position}></PlayerComponent>
 								})}
+								{Object.keys(playersPositions).length <= 0 && screenMSG}
 							</div>
 						</TransformComponent>
 					</React.Fragment>
 				)}
 			</TransformWrapper>
 		</div>
-		<PlayerUI board={board} playersPositions={playersPositions} setPlayersPositions={setPlayersPositions} playersAssets={playersAssets} setPlayersAssets={setPlayersAssets} />
+		{Object.keys(playersPositions).length > 0 &&
+			<PlayerUI board={board} playersPositions={playersPositions} setPlayersPositions={setPlayersPositions} playersAssets={playersAssets} setPlayersAssets={setPlayersAssets} />
+		}
 	</>)
 }
 

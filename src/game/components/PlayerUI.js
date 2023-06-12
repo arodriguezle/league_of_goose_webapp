@@ -2,7 +2,7 @@ import { getImage } from "../../ImageFactory"
 import { IMAGE_ROUTES, getSpecialDicesDescriptionByName, getSpecialDicesNicenameByName } from "../../domain/constants"
 import { useEffect, useState, useRef } from "react"
 import { SocketController } from "../../domain/socket_controller"
-import { getDashboxEffect, getDiceNameByIndex, throwDiceAndGetValue } from "../../domain/logics"
+import { getDiceNameByIndex } from "../../domain/logics"
 import { AnimationController } from "../animation_controller"
 const PlayerUI = (props) => {
 	const { playersAssets, playersPositions, setPlayersPositions, setPlayersAssets } = props
@@ -27,97 +27,7 @@ const PlayerUI = (props) => {
 	const movePlayerCallback = (player_name, position) => {
 		const updatedPlayersPositions = { ...playersPositions }
 		updatedPlayersPositions[player_name] = position
-		console.log('updatedPlayersPositions', updatedPlayersPositions)
 		setPlayersPositions(updatedPlayersPositions)
-	}
-
-	const giveDiceCallback = (player_name, value) => {
-		const updatedPlayersAssets = { ...playersAssets }
-		console.log('giveDiceCallback', player_name, value)
-		console.log('updatedPlayersAssets', updatedPlayersAssets)
-		updatedPlayersAssets[player_name].dices[value] += 1
-		setPlayersAssets(updatedPlayersAssets)
-	}
-
-	const removeDiceCallback = (player_name, value) => {
-		const updatedPlayersAssets = { ...playersAssets }
-		console.log('removeDiceCallback', player_name, value)
-		console.log('updatedPlayersAssets', updatedPlayersAssets)
-		updatedPlayersAssets[player_name].dices[value] -= 1
-		setPlayersAssets(updatedPlayersAssets)
-	}
-
-	const showTextCallback = (player_name, value) => {
-		console.log('showTextCallback', player_name, value)
-	}
-
-	const effectCallback = (player_name, position) => {
-		console.log('effectCallback', props)
-		if (props.board) {
-			const result = getDashboxEffect(props.board.dashboxs[position])
-			setTimeout(() => {
-				switch (result.actor) {
-					case 'self':
-						doAction(result.action, player_name, result.value)
-						break;
-					case 'all':
-						Object.keys(playersPositions).forEach((player_name) => {
-							doAction(result.action, player_name, result.value)
-						})
-						break;
-				}
-			}, 25000)
-		}
-	}
-
-	const doAction = (action, target, value) => {
-		switch (action) {
-			case 'move':
-				switch (value) {
-					case 'goose':
-						// find next goose
-						let next_goose = 0
-						for (let i = playersPositions[target] + 1; i < 63; i++) {
-							if (props.board.dashboxs[i].type === 'goose') {
-								next_goose = i
-								break
-							}
-						}
-						AnimationController.movePlayerAnimation(target, playersPositions[target], next_goose, movePlayerCallback)
-						SocketController.emit('send_move_effect', { target: value, value: next_goose })
-						break;
-					case 'skip':
-					// TODO
-					case 'start':
-						console.log(playersPositions[target], 'move player to', 0)
-						AnimationController.movePlayerAnimation(target, playersPositions[target], 0, movePlayerCallback)
-						SocketController.emit('send_move_effect', { target: value, value: 0 })
-						break;
-					// gimmick to move player to the end of the board
-					case 'end':
-						AnimationController.movePlayerAnimation(target, playersPositions[target], 63, movePlayerCallback)
-						SocketController.emit('send_move_effect', { target: value, value: 63 })
-						break;
-					default:
-						console.log(playersPositions[target], 'move player to', value)
-						AnimationController.movePlayerAnimation(target, playersPositions[target], value, movePlayerCallback)
-						SocketController.emit('send_move_effect', { target: value, value: value })
-						break
-				}
-				break;
-			case 'give':
-				AnimationController.giveDiceAnimation(target, value, giveDiceCallback)
-				SocketController.emit('give_dice_effect', { target: value, value: value })
-				break;
-			case 'remove':
-				AnimationController.removeDiceAnimation(target, value, removeDiceCallback)
-				SocketController.emit('remove_dice_effect', { target: value })
-				break;
-			default:
-				AnimationController.showTextAnimation(target, value, showTextCallback)
-				SocketController.emit('show_text_effect', { target: value, value: value })
-				break;
-		}
 	}
 
 	function usePreviousState(state) {
@@ -128,40 +38,29 @@ const PlayerUI = (props) => {
 		return ref.current;
 	}
 
-
 	const compareStates = (prev, next) => {
 		// check player postion changes
 		if (prev && next && prev.players_positions && next.players_positions) {
 			Object.keys(prev.players_positions).forEach((player_name) => {
-				console.log('prev.players_positions[player_name] !== next.players_positions[player_name]', prev.players_positions[player_name] !== next.players_positions[player_name])
 				if (prev.players_positions[player_name] !== next.players_positions[player_name]) {
 					// player position changed
-					setTimeout(() => {
-						console.log('player position changed', next.players_positions, next.players_positions[player_name])
-						AnimationController.movePlayerAnimation(player_name, prev.players_positions[player_name], next.players_positions[player_name], movePlayerCallback)
-					}, 3000)
-					setTimeout(() => {
-						AnimationController.triggerDashboxAnimation(player_name, next.players_positions[player_name], effectCallback)
-					}, 3000)
+					AnimationController.movePlayerAnimation(player_name, prev.players_positions[player_name], next.players_positions[player_name], movePlayerCallback)
 				}
-
 			})
 		}
 	}
 
 	const throwDiceHandler = () => {
-		const value = throwDiceAndGetValue(getDiceNameByIndex(selectedDice))
-		console.log('playersPositions', playersPositions[SocketController.player.username])
-		// const value = 1
-		SocketController.emit('send_throw_dice', value)
+		SocketController.emit('send_throw_dice', getDiceNameByIndex(selectedDice))
 		SocketController.on('game_update', (data) => {
+			console.log('EVENT RECIVED', data)
 			setGameState(data.game_state)
 		})
 	}
 
 
 	useEffect(() => {
-		if (!previousState || gameState.round > previousState.round) {
+		if (!previousState || gameState.round > previousState.round || gameState.effect_round > previousState.effect_round) {
 			compareStates(previousState, gameState)
 		}
 	}, [gameState])

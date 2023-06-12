@@ -32,12 +32,14 @@ const RegisterForm = () => {
 		}
 
 		const response = await postData(USE_API_ENDPOINT(API_ENDPOINTS.register), { "username": username, "email": email, "password": password, "terms": terms })
-		if (response.status === 201) {
+		if (response && response.status === 201) {
 			setSuccessMsg("You have successfully registered!");
 			SocketController.join()
 			setTimeout(() => {
 				window.location.href = "/";
 			}, 1500);
+		} else {
+			setErrorMsg("Something went wrong, please try again later");
 		}
 	}
 

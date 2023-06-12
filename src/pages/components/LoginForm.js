@@ -27,13 +27,13 @@ const LoginForm = () => {
 		bodyFormData.append('email', email);
 		bodyFormData.append('password', password);
 		const response = await postData(USE_API_ENDPOINT(API_ENDPOINTS.login), bodyFormData, { 'Content-Type': 'multipart/form-data' })
-		if (response.status === 200) {
+		if (response && response.status === 200) {
 			setSuccessMsg("You have successfully logged in!");
 			SocketController.join()
 			setTimeout(() => {
 				window.location.href = "/";
 			}, 1500);
-		} else if (response.response.status === 401) {
+		} else if (response && response.response.status === 401) {
 			setErrorMsg("Wrong email or password");
 		} else {
 			setErrorMsg("Something went wrong");
