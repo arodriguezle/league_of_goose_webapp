@@ -150,8 +150,8 @@ export class AnimationController {
 		const title = getKeyByValue(DASHBOX_TYPES, value);
 		let desc = getDashboxDescription(DASHBOX_TYPES_ACTIONS[title])
 
-		// override description
-		desc.replace('You', player_name).replace('get', 'gets').replace('go', 'goes').replace('move', 'moves');
+		// TODO: override description
+		// desc.replace('You', player_name).replace('get', 'gets').replace('go', 'goes').replace('move', 'moves');
 
 		const toast_effect_container = document.getElementById('toast_effect_container');
 		const toast_effect_img = document.getElementById('toast_effect_img');

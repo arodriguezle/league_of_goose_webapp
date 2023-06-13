@@ -62,6 +62,7 @@ const Hub = () => {
 					<div className="my-8">
 						<div className='uppercase font-bold text-white'>DICES</div>
 						{/* TODO: remove test skins */}
+						{/* FIXME: fix or disable set dices */}
 						<SkinSelector skins={[inventory.dice_skins, "dice_aqua", "dice_froggy", "dice_nature"]} setSelectedDiceSkin={setSelectedDiceSkin} />
 						<Select label="Select First Custom Dice" value={dice_1} defaultValue={dice_1} onChange={(new_val) => handleDiceSelected(1, new_val)}>
 							{openOptions1.map((option, index) => {

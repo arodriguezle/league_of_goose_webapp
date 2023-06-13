@@ -233,6 +233,3 @@ export const getSpecialDicesDescriptionByName = (dice_name) => {
 			}
 	}
 }
-
-// DEPRECATED, not efficient enough
-// export const GALLERY_URL = "https://raw.githubusercontent.com/arodriguezle/league_of_goose_gallery";

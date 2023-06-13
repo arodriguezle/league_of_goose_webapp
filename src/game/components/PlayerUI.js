@@ -140,7 +140,7 @@ const PlayerUI = (props) => {
 					bodyFormData.append('ice', playersAssets[player_name].inventory.ice);
 					postData(USE_API_ENDPOINT(API_ENDPOINTS.updateInventory), bodyFormData, { 'Content-Type': 'multipart/form-data' })
 						.then((data) => {
-							console.log(data); // JSON data parsed by `data.json()` call
+							console.log(data);
 						});
 				})
 			})
@@ -232,7 +232,7 @@ const PlayerUI = (props) => {
 						backgroundSize: 'contain',
 						backgroundPosition: 'center',
 						height: '100%',
-						// flip
+						// FIXME: flip
 						transform: 'scaleX(-1)',
 					}}
 						onClick={() => selectDiceHandler(-1)}>

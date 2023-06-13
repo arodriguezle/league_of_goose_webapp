@@ -14,7 +14,6 @@ const PlayerComponent = (props) => {
 
 	useEffect(() => {
 		if (props.size) {
-			// use generateDashboxPositions
 			const dashbox_positions = generateDashboxPositions(props.boardSize);
 			const newPosition = dashbox_positions[props.position];
 			setPosition({ x: newPosition.left, y: newPosition.top });
