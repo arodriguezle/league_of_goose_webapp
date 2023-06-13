@@ -7,7 +7,6 @@ import { SocketController } from "../../domain/socket_controller";
 const RoomManager = (props) => {
 	const [roomPlayers, setRoomPlayers] = useState([{}, {}, {}])
 	const [player, setPlayer] = useState(null)
-	const [roomState, setRoomState] = useState(null)
 	const [open, setOpen] = useState(false);
 	const [openInvitation, setOpenInvitation] = useState(false);
 	const [invitor, setInvitor] = useState(null)
@@ -16,6 +15,7 @@ const RoomManager = (props) => {
 	const handleInvite = (player_username) => {
 		SocketController.emit("invite_player", player_username)
 	}
+	const [loadingPopover, setLoadingPopover] = useState(false)
 
 	const handleAccept = (accepted) => {
 		if (accepted) {
@@ -34,25 +34,26 @@ const RoomManager = (props) => {
 	};
 
 	const startGame = () => {
-		console.log('startGame', props.skins)
 		let dice_skin = props.skins.dice_skins[0]
 		if (props.diceSkin !== 'goose_default') {
 			dice_skin = props.skins.dice_skins[props.diceSkin]
 		}
-		console.log('dice_skin', dice_skin)
 		let goose_skin = props.skins.goose_skins[0]
 		if (props.gooseSkin !== 'goose_default') {
 			goose_skin = props.skins.goose_skins[props.gooseSkin]
 		}
-		console.log('goose_skin', goose_skin)
+
+		setLoadingPopover(true)
+
 		SocketController.emit("set_player_game_assets", {
 			dices: props.dices,
 			diceSkin: dice_skin,
 			gooseSkin: goose_skin,
 			inventory: { default: 0, fire: 0, ice: 0, wind: 0, earth: 0, water: 0, plant: 0 }
 		})
-		SocketController.emit("start_game", true)
-		window.location.href = "/game"
+		SocketController.on("start_game", (data) => {
+			window.location.href = "/game"
+		})
 	}
 
 	useEffect(() => {
@@ -61,9 +62,6 @@ const RoomManager = (props) => {
 
 	useEffect(() => {
 		if (socket) {
-			SocketController.on("room_state", (data) => {
-				setRoomState(data.room_state)
-			});
 			SocketController.on("room_update", (data) => {
 				// check if player is in the room
 				const player_in_room = data.players.filter((p) => {
@@ -115,20 +113,20 @@ const RoomManager = (props) => {
 	}
 
 	return (
-		<div className="space-y-2">
-			<div className="bg-[#faf3e0] border-black border-2 mx-8 py-2">
+		<div>
+			<div className="bg-[#faf3e0] border-black border-2 mx-8 py-2 pb-2">
 				{SocketController.getSocket() && player ? player.username : ""}
 			</div>
 			{roomPlayers.map((other_player, index) => {
-				return <div key={index} className="bg-[#faf3e0] border-black border-2 mx-8 py-2 cursor-pointer" onClick={() => handleInvitations()}>
+				return <div key={index} className="bg-[#faf3e0] border-black border-2 mx-8 py-2 cursor-pointer pb-2" onClick={() => handleInvitations()}>
 					{other_player.username ? other_player.username : "+"}
 				</div>
 			})}
 			{SocketController.getSocket() ?
-				<div className="text-[#4caf50]">
+				<div className="text-[#4caf50] pb-2">
 					Connected
 				</div> :
-				<div className="text-[#f44336]">
+				<div className="text-[#f44336] pb-2">
 					Connected
 				</div>
 			}
@@ -153,6 +151,22 @@ const RoomManager = (props) => {
 						<Chip color="green" value="CONTINUE" className="hover:bg-green-700" onClick={() => startGame()}>CONTINUE</Chip>
 					</PopoverContent>
 				</Popover>
+			}
+			{loadingPopover &&
+				// loading component with animated spinner
+				<div className="fixed top-0 left-0 w-screen h-screen z-50 items-center justify-center block" style={
+					{ background: "rgba(0,0,0,.7)" }
+				}>
+					<div className=" -translate-y-1/2 -translate-x-1/2 absolute top-1/2 left-1/2 text-center">
+						<div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-white-900"></div>
+						<div className="text-white">
+							<br></br>
+							Waiting for
+							<br></br>
+							other players...
+						</div>
+					</div>
+				</div>
 			}
 			<PlayerInvitationsContent open={open} handleOpen={handleOpen} handleInvite={handleInvite} available_players={available_players} />
 			<GotPlayerInvitationContent open={openInvitation} handleOpen={handleOpenInvitation} handleAccept={handleAccept} invitor={invitor} />

@@ -3,6 +3,8 @@ export const API_ENDPOINTS = {
 	login: '/login',
 	get: '/get',
 	buy: '/buy',
+	// this should go on the nodejs server
+	updateInventory: '/updateInventory',
 }
 
 export function USE_API_ENDPOINT(endpoint) {
