@@ -55,7 +55,7 @@ const Shop = () => {
 							{inventory && Object.entries(inventory.currency).map((item, index) => {
 								if (index < 4) {
 									const title = item[0];
-									const currency_image = getImage(IMAGE_ROUTES.minigooses, `goose_${title}.png`, { alt: title }).props;
+									const currency_image = getImage(IMAGE_ROUTES.minigeese, `goose_${title}.png`, { alt: title }).props;
 									return <div className="text-white text-xl inline-flex"><div style={
 										{
 											backgroundImage: `url("${currency_image.src}")`,
@@ -72,7 +72,7 @@ const Shop = () => {
 							{inventory && Object.entries(inventory.currency).map((item, index) => {
 								if (index >= 4) {
 									const title = item[0];
-									const currency_image = getImage(IMAGE_ROUTES.minigooses, `goose_${title}.png`, { alt: title }).props;
+									const currency_image = getImage(IMAGE_ROUTES.minigeese, `goose_${title}.png`, { alt: title }).props;
 									return <div className="text-white text-xl inline-flex"><div style={
 										{
 											backgroundImage: `url("${currency_image.src}")`,

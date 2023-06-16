@@ -25,7 +25,7 @@ export const IMAGE_ROUTES = {
 	dices_results: "dices_results",
 	maps: "maps",
 	skins: "skins",
-	minigooses: "minigooses",
+	minigeese: "minigeese",
 	backgrounds: "backgrounds",
 	icons: "icons",
 	portraits: "portraits",

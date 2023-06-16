@@ -309,7 +309,7 @@ export class AnimationController {
 					const currency_value = minigoose[1];
 					const currency = document.createElement('div');
 					currency.classList.add('inline-flex', 'justify-center', 'items-center', 'text-white', 'mb-1');
-					const currency_image = getImage(IMAGE_ROUTES.minigooses, `goose_${currency_name}.png`, { alt: currency_name }).props;
+					const currency_image = getImage(IMAGE_ROUTES.minigeese, `goose_${currency_name}.png`, { alt: currency_name }).props;
 					const currency_image_tag = document.createElement('img');
 					currency_image_tag.classList.add('w-8', 'h-8', 'mr-2');
 					currency_image_tag.src = currency_image.src;
@@ -325,7 +325,7 @@ export class AnimationController {
 					const currency_value = minigoose[1];
 					const currency = document.createElement('div');
 					currency.classList.add('inline-flex', 'justify-center', 'items-center', 'text-white', 'mb-1');
-					const currency_image = getImage(IMAGE_ROUTES.minigooses, `goose_${currency_name}.png`, { alt: currency_name }).props;
+					const currency_image = getImage(IMAGE_ROUTES.minigeese, `goose_${currency_name}.png`, { alt: currency_name }).props;
 					const currency_image_tag = document.createElement('img');
 					currency_image_tag.classList.add('w-8', 'h-8', 'mr-2');
 					currency_image_tag.src = currency_image.src;
@@ -375,7 +375,7 @@ export class AnimationController {
 				const currency_value = minigoose[1];
 				const currency = document.createElement('div');
 				currency.classList.add('inline-flex', 'justify-center', 'items-center', 'text-white', 'mb-1');
-				const currency_image = getImage(IMAGE_ROUTES.minigooses, `goose_${currency_name}.png`, { alt: currency_name }).props;
+				const currency_image = getImage(IMAGE_ROUTES.minigeese, `goose_${currency_name}.png`, { alt: currency_name }).props;
 				const currency_image_tag = document.createElement('img');
 				currency_image_tag.classList.add('w-8', 'h-8', 'mr-2');
 				currency_image_tag.src = currency_image.src;
@@ -391,7 +391,7 @@ export class AnimationController {
 				const currency_value = minigoose[1];
 				const currency = document.createElement('div');
 				currency.classList.add('inline-flex', 'justify-center', 'items-center', 'text-white', 'mb-1');
-				const currency_image = getImage(IMAGE_ROUTES.minigooses, `goose_${currency_name}.png`, { alt: currency_name }).props;
+				const currency_image = getImage(IMAGE_ROUTES.minigeese, `goose_${currency_name}.png`, { alt: currency_name }).props;
 				const currency_image_tag = document.createElement('img');
 				currency_image_tag.classList.add('w-8', 'h-8', 'mr-2');
 				currency_image_tag.src = currency_image.src;

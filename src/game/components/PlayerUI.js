@@ -16,13 +16,13 @@ const PlayerUI = (props) => {
 	const [gameState, setGameState] = useState(null)
 	const previousState = usePreviousState(gameState);
 
-	const minigoose_default = getImage(IMAGE_ROUTES.minigooses, "goose_default.png", { alt: 'minigoose_default' }).props
-	const minigoose_earth = getImage(IMAGE_ROUTES.minigooses, "goose_earth.png", { alt: 'minigoose_earth' }).props
-	const minigoose_fire = getImage(IMAGE_ROUTES.minigooses, "goose_fire.png", { alt: 'minigoose_fire' }).props
-	const minigoose_water = getImage(IMAGE_ROUTES.minigooses, "goose_water.png", { alt: 'minigoose_water' }).props
-	const minigoose_ice = getImage(IMAGE_ROUTES.minigooses, "goose_ice.png", { alt: 'minigoose_ice' }).props
-	const minigoose_wind = getImage(IMAGE_ROUTES.minigooses, "goose_wind.png", { alt: 'minigoose_wind' }).props
-	const minigoose_plant = getImage(IMAGE_ROUTES.minigooses, "goose_plant.png", { alt: 'minigoose_plant' }).props
+	const minigoose_default = getImage(IMAGE_ROUTES.minigeese, "goose_default.png", { alt: 'minigoose_default' }).props
+	const minigoose_earth = getImage(IMAGE_ROUTES.minigeese, "goose_earth.png", { alt: 'minigoose_earth' }).props
+	const minigoose_fire = getImage(IMAGE_ROUTES.minigeese, "goose_fire.png", { alt: 'minigoose_fire' }).props
+	const minigoose_water = getImage(IMAGE_ROUTES.minigeese, "goose_water.png", { alt: 'minigoose_water' }).props
+	const minigoose_ice = getImage(IMAGE_ROUTES.minigeese, "goose_ice.png", { alt: 'minigoose_ice' }).props
+	const minigoose_wind = getImage(IMAGE_ROUTES.minigeese, "goose_wind.png", { alt: 'minigoose_wind' }).props
+	const minigoose_plant = getImage(IMAGE_ROUTES.minigeese, "goose_plant.png", { alt: 'minigoose_plant' }).props
 
 	const [player_name, setPlayerName] = useState(null)
 
